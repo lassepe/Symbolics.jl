@@ -7,13 +7,15 @@ using TermInterface
 
 using Metatheory
 
-using DocStringExtensions
+using DocStringExtensions, Markdown
 
 using LinearAlgebra
 
 using Reexport
 
 using DomainSets
+
+using Setfield
 
 import DomainSets: Domain
 @reexport using SymbolicUtils
@@ -24,11 +26,13 @@ import SymbolicUtils: Term, Add, Mul, Pow, Sym,
                       FnType, @rule, Rewriters, substitute,
                       promote_symtype
 
+using SymbolicUtils.Code
+
 import Metatheory.Rewriters: Chain, Prewalk, Postwalk, Fixpoint
 
 import SymbolicUtils.Code: toexpr
 
-import ArrayInterface
+import ArrayInterfaceCore
 
 using RuntimeGeneratedFunctions
 RuntimeGeneratedFunctions.init(@__MODULE__)
@@ -105,6 +109,10 @@ include("integral.jl")
 include("array-lib.jl")
 
 include("linear_algebra.jl")
+
+using Groebner
+include("groebner_basis.jl")
+export groebner_basis
 
 import Libdl
 include("build_function.jl")

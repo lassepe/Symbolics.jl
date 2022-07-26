@@ -15,8 +15,7 @@ const show_numwrap = Ref(false)
 
 Num(x::Num) = x # ideally this should never be called
 (n::Num)(args...) = Num(value(n)(map(value,args)...))
-value(x) = x
-value(x::Num) = unwrap(x)
+value(x) = unwrap(x)
 
 SciMLBase.issymbollike(::Num) = true
 SciMLBase.issymbollike(::SymbolicUtils.Symbolic) = true
@@ -169,3 +168,18 @@ _iszero(::Symbolic) = false
 _isone(::Symbolic) = false
 _iszero(x::Num) = _iszero(value(x))
 _isone(x::Num) = _isone(value(x))
+
+Code.cse(x::Num) = Code.cse(unwrap(x))
+
+## Documentation
+# This method makes the docstring show all entries in the metadata dict associated with an instance of Num 
+function Base.Docs.getdoc(x::Num)
+    x = unwrap(x)
+    strings =
+        ["A variable of type Symbolics.Num (Num wraps anything in a type that is a subtype of Real)";
+        "# Metadata"]
+    for (key, val) in collect(pairs(x.metadata))
+        push!(strings, string(string(key), ": ", string(val)))
+    end
+    Markdown.parse(join(strings, "\n\n  "))
+end

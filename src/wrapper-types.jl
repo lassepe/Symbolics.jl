@@ -36,7 +36,7 @@ macro symbolic_wrap(expr)
 
         Symbolics.has_symwrapper(::Type{<:$supertype}) = true
         Symbolics.wrapper_type(::Type{<:$supertype}) = $T
-        Symbolics.is_wrapper_type(::Type{$T}) = true # used in `@register`
+        Symbolics.is_wrapper_type(::Type{<:$T}) = true # used in `@register`
         Symbolics.wraps_type(::Type{$T}) = $supertype
         Symbolics.iswrapped(::$T) = true
     end |> esc
@@ -98,7 +98,8 @@ function wrap_func_expr(mod, expr)
     function type_options(arg)
         if arg isa Expr && arg.head == :(::)
             T = Base.eval(mod, arg.args[2])
-            has_symwrapper(T) ? (T, :(SymbolicUtils.Symbolic{<:$T}), wrapper_type(T))  : (T,)
+            has_symwrapper(T) ? (T, :(SymbolicUtils.Symbolic{<:$T}), wrapper_type(T)) :
+                                (T,:(SymbolicUtils.Symbolic{<:$T}))
         elseif arg isa Expr && arg.head == :(...)
             Ts = type_options(arg.args[1])
             map(x->Vararg{x},Ts)
